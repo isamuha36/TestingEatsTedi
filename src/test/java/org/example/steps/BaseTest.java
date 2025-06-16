@@ -22,7 +22,7 @@ public class BaseTest {
         caps.setCapability("noReset", "true"); // Optional: agar tidak install ulang app setiap kali tes
 
         // Menggunakan path relatif yang sudah kita diskusikan
-        String apkPath = System.getProperty("user.dir") + "/apps/app-kasir.apk"; // Ganti nama APK jika perlu
+        String apkPath = System.getProperty("user.dir") + "/apps/app-debug.apk"; // Ganti nama APK jika perlu
         caps.setCapability("app", apkPath);
 
         // Appium 2.x menggunakan path root, bukan /wd/hub

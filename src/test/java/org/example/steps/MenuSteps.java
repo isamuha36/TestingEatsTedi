@@ -26,16 +26,6 @@ public class MenuSteps extends BaseTest {
         this.onBoardingPage = new OnBoardingPage(driver);
     }
 
-    @Given("pengguna sudah login sebagai Kasir")
-    public void pengguna_sudah_login_sebagai_Kasir() {
-        if(onBoardingPage.isOnboardingDisplayed()){
-            onBoardingPage.skipOnboarding();
-        }
-        assertTrue("Halaman login tidak ditemukan", loginPage.isLoginPageDisplayed());
-        loginPage.login("cashier1", "password");
-        assertTrue("Gagal login untuk setup", menuPage.isMenuPageDisplayed());
-    }
-
     @Given("menu {string} milik supplier {string} tersedia dengan stok ≥ {int}")
     public void menu_tersedia_dengan_stok_cukup(String menuName, String supplier, int stok) {
         // Di dunia nyata, ini akan memverifikasi data via API atau database.
