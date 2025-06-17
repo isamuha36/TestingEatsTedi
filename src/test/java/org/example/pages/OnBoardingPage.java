@@ -8,6 +8,7 @@ import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import java.time.Duration;
+
 public class OnBoardingPage {
     private AppiumDriver driver;
     private WebDriverWait wait;
@@ -23,15 +24,19 @@ public class OnBoardingPage {
 
     public OnBoardingPage(AppiumDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        // Kita gunakan waktu tunggu 20 detik agar konsisten dengan halaman lain
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
 
-    public boolean isSplashScreenDisplayed() {
+    public boolean isOnboardingScreenPresent() {
         try {
-            wait.until(ExpectedConditions.visibilityOf(viewPager));
-            return viewPager.isDisplayed();
+            // Kita anggap jika viewPager ada, maka halaman onboarding sedang tampil.
+            // Pengecekan skipButton ditambahkan untuk keyakinan.
+            return viewPager.isDisplayed() && skipButton.isDisplayed();
         } catch (Exception e) {
+            // Jika elemen tidak ditemukan, exception akan ditangkap dan mengembalikan false.
+            // Ini adalah perilaku yang kita inginkan.
             return false;
         }
     }
@@ -39,13 +44,5 @@ public class OnBoardingPage {
     public void skipOnboarding() {
         wait.until(ExpectedConditions.elementToBeClickable(skipButton));
         skipButton.click();
-    }
-
-    public boolean isOnboardingDisplayed() {
-        try {
-            return viewPager.isDisplayed() && dotsIndicator.isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

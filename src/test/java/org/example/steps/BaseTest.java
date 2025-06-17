@@ -18,7 +18,7 @@ public class BaseTest {
         caps.setCapability("deviceName", "emulator-5554"); // Pastikan nama emulator/device sesuai
         caps.setCapability("automationName", "UiAutomator2");
         caps.setCapability("appPackage", "com.example.eatstedi");
-        caps.setCapability("appActivity", ".login.LoginActivity"); // Arahkan ke activity yang benar saat start
+        caps.setCapability("appActivity", ".activity.SplashScreenActivity"); // Arahkan ke activity yang benar saat start
         caps.setCapability("noReset", "true"); // Optional: agar tidak install ulang app setiap kali tes
 
         // Menggunakan path relatif yang sudah kita diskusikan

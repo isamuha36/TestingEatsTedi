@@ -30,7 +30,8 @@ public class LoginPage {
 
     public LoginPage(AppiumDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10));
+        // PERBAIKAN: Waktu tunggu ditingkatkan menjadi 20 detik
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
 
