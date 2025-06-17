@@ -5,7 +5,7 @@ Feature: Authentication
 
   @auth @critical
   Scenario: Login valid
-    # DIUBAH: Dua baris berikut digabung menjadi satu
+
     When pengguna melewati onboarding jika ditampilkan
     And pengguna memasukkan username "cashier1" dan password "password"
     And pengguna menekan tombol "Login"
@@ -14,7 +14,7 @@ Feature: Authentication
 
   @auth @critical
   Scenario: Login invalid (password salah)
-    # DIUBAH: Dua baris berikut digabung menjadi satu
+
     When pengguna melewati onboarding jika ditampilkan
     And pengguna memasukkan username "cashier1" dan password "wrong_password"
     And pengguna menekan tombol "Login"
