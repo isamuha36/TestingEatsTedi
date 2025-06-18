@@ -4,22 +4,31 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
+import org.example.pages.DashboardKasirPage;
 import org.example.pages.OnBoardingPage;
 import org.example.pages.LoginPage;
 import org.example.pages.MenuPage;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
+
+import java.time.Duration;
+import java.util.List;
+
 import static org.junit.Assert.*;
 
 public class AuthenticationSteps extends BaseTest {
 
     private OnBoardingPage onboardingPage;
     private LoginPage loginPage;
-    private MenuPage menuPage;
+    private DashboardKasirPage dashboardPage;
 
     // Method ini menginisialisasi semua Page Object yang dibutuhkan
     private void initPages() {
         onboardingPage = new OnBoardingPage(driver);
         loginPage = new LoginPage(driver);
-        menuPage = new MenuPage(driver);
+        dashboardPage = new DashboardKasirPage(driver);
     }
 
     @Given("aplikasi dibuka")
@@ -58,13 +67,24 @@ public class AuthenticationSteps extends BaseTest {
 
     @Then("pengguna berhasil login dengan role {string}")
     public void pengguna_berhasil_login_dengan_role(String role) {
-        assertTrue("Gagal login, tidak diarahkan ke halaman Menu", menuPage.isMenuPageDisplayed());
+
+        // Periksa apakah elemen navigasi log aktivitas ada
+        List<WebElement> logActivityNav = driver.findElements(By.id("com.example.eatstedi:id/log_activity_nav")); // Sesuaikan ID
+
+        if (role.equalsIgnoreCase("admin")) {
+            assertTrue("Pengguna seharusnya admin, tetapi navigasi log aktivitas tidak ditemukan.", !logActivityNav.isEmpty());
+        } else if (role.equalsIgnoreCase("kasir")) {
+            assertTrue("Pengguna seharusnya kasir, tetapi navigasi log aktivitas ditemukan.", logActivityNav.isEmpty());
+        }
     }
 
     @And("pengguna diarahkan ke halaman Dashboard Kasir")
     public void pengguna_diarahkan_ke_halaman_dashboard_kasir() {
-        // Step ini hanya untuk kejelasan di Gherkin
-        System.out.println("Pengguna berhasil diarahkan ke Dashboard/Menu.");
+        if (!dashboardPage.isDashboardActive()) {
+            System.out.println("Halaman saat ini: " + driver.getPageSource());
+            fail("Pengguna tidak diarahkan ke Dashboard Kasir");
+        }
+        assertTrue("Pengguna tidak diarahkan ke Dashboard Kasir", dashboardPage.isDashboardActive());
     }
 
     @Then("aplikasi menampilkan pesan error {string}")

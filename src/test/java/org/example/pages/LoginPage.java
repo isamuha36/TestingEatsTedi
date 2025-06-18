@@ -30,7 +30,6 @@ public class LoginPage {
 
     public LoginPage(AppiumDriver driver) {
         this.driver = driver;
-        // PERBAIKAN: Waktu tunggu ditingkatkan menjadi 20 detik
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
@@ -75,21 +74,22 @@ public class LoginPage {
         }
     }
 
+    public boolean isErrorMessageDisplayed(String expectedMessage) {
+        try {
+
+            String actualMessage = getToastMessage();
+            return actualMessage.contains(expectedMessage);
+        } catch (Exception e) {
+            return false;
+        }
+    }
+
     public String getToastMessage() {
         try {
             wait.until(ExpectedConditions.visibilityOf(toastMessage));
             return toastMessage.getText();
         } catch (Exception e) {
             return "";
-        }
-    }
-
-    public boolean isErrorMessageDisplayed(String expectedMessage) {
-        try {
-            String actualMessage = getToastMessage();
-            return actualMessage.contains(expectedMessage);
-        } catch (Exception e) {
-            return false;
         }
     }
 }
