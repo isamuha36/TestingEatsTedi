@@ -24,19 +24,14 @@ public class OnBoardingPage {
 
     public OnBoardingPage(AppiumDriver driver) {
         this.driver = driver;
-        // Kita gunakan waktu tunggu 20 detik agar konsisten dengan halaman lain
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
 
     public boolean isOnboardingScreenPresent() {
         try {
-            // Kita anggap jika viewPager ada, maka halaman onboarding sedang tampil.
-            // Pengecekan skipButton ditambahkan untuk keyakinan.
             return viewPager.isDisplayed() && skipButton.isDisplayed();
         } catch (Exception e) {
-            // Jika elemen tidak ditemukan, exception akan ditangkap dan mengembalikan false.
-            // Ini adalah perilaku yang kita inginkan.
             return false;
         }
     }

@@ -1,6 +1,7 @@
 package org.example.pages;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
@@ -12,6 +13,9 @@ import java.time.Duration;
 public class DashboardKasirPage {
     private AppiumDriver driver;
     private WebDriverWait wait;
+    @AndroidFindBy(xpath = "//android.widget.CheckedTextView[@text='Keluar'")
+    private WebElement logoutButton;
+
 
     public DashboardKasirPage(AppiumDriver driver) {
         this.driver = driver;
@@ -21,7 +25,6 @@ public class DashboardKasirPage {
 
     public boolean isDashboardActive() {
         try {
-            // Wait for and locate the "Dasbor" menu item that is checked
             WebElement dashboardMenu = wait.until(ExpectedConditions.presenceOfElementLocated(
                     By.xpath("//android.widget.CheckedTextView[@text='Dasbor' and @checked='true']")
             ));
@@ -29,5 +32,10 @@ public class DashboardKasirPage {
         } catch (Exception e) {
             return false;
         }
+    }
+
+    public void clickLogoutButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(logoutButton));
+        logoutButton.click();
     }
 }

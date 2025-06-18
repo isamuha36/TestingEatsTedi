@@ -4,6 +4,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
+import io.cucumber.java.After;
 import org.example.pages.DashboardKasirPage;
 import org.example.pages.OnBoardingPage;
 import org.example.pages.LoginPage;
@@ -19,12 +20,10 @@ import java.util.List;
 import static org.junit.Assert.*;
 
 public class AuthenticationSteps extends BaseTest {
-
     private OnBoardingPage onboardingPage;
     private LoginPage loginPage;
     private DashboardKasirPage dashboardPage;
 
-    // Method ini menginisialisasi semua Page Object yang dibutuhkan
     private void initPages() {
         onboardingPage = new OnBoardingPage(driver);
         loginPage = new LoginPage(driver);
@@ -33,44 +32,35 @@ public class AuthenticationSteps extends BaseTest {
 
     @Given("aplikasi dibuka")
     public void aplikasi_dibuka() {
-        // Panggil initPages agar semua objek Page dibuat
         initPages();
         assertTrue("Aplikasi tidak berhasil dibuka", driver != null);
     }
 
-    // Ini adalah implementasi untuk langkah yang 'undefined' tadi
     @When("pengguna melewati onboarding jika ditampilkan")
     public void pengguna_melewati_onboarding_jika_ditampilkan() {
-        // Cek apakah halaman onboarding ada
         if (onboardingPage.isOnboardingScreenPresent()) {
             System.out.println("Onboarding screen terdeteksi, akan dilewati (skip).");
             onboardingPage.skipOnboarding();
         } else {
             System.out.println("Onboarding screen tidak ditemukan, menunggu halaman login.");
         }
-
-        // Pastikan kita sudah di halaman login sebelum melanjutkan
-        // Ini akan menunggu hingga 20 detik (sesuai update terakhir di LoginPage)
         assertTrue("Gagal berada di halaman login setelah memeriksa onboarding.", loginPage.isLoginPageDisplayed());
     }
 
     @And("pengguna memasukkan username {string} dan password {string}")
     public void pengguna_memasukkan_username_dan_password(String username, String password) {
+        System.out.println("Memasukan username dan pass");
         loginPage.login(username, password);
     }
 
     @And("pengguna menekan tombol {string}")
     public void pengguna_menekan_tombol(String buttonName) {
-        // Logika klik sudah ada di method login(), jadi step ini hanya untuk kejelasan
         System.out.println("Tombol " + buttonName + " ditekan.");
     }
 
     @Then("pengguna berhasil login dengan role {string}")
     public void pengguna_berhasil_login_dengan_role(String role) {
-
-        // Periksa apakah elemen navigasi log aktivitas ada
-        List<WebElement> logActivityNav = driver.findElements(By.id("com.example.eatstedi:id/log_activity_nav")); // Sesuaikan ID
-
+        List<WebElement> logActivityNav = driver.findElements(By.id("com.example.eatstedi:id/log_activity_nav"));
         if (role.equalsIgnoreCase("admin")) {
             assertTrue("Pengguna seharusnya admin, tetapi navigasi log aktivitas tidak ditemukan.", !logActivityNav.isEmpty());
         } else if (role.equalsIgnoreCase("kasir")) {
@@ -81,7 +71,6 @@ public class AuthenticationSteps extends BaseTest {
     @And("pengguna diarahkan ke halaman Dashboard Kasir")
     public void pengguna_diarahkan_ke_halaman_dashboard_kasir() {
         if (!dashboardPage.isDashboardActive()) {
-            System.out.println("Halaman saat ini: " + driver.getPageSource());
             fail("Pengguna tidak diarahkan ke Dashboard Kasir");
         }
         assertTrue("Pengguna tidak diarahkan ke Dashboard Kasir", dashboardPage.isDashboardActive());
@@ -104,5 +93,11 @@ public class AuthenticationSteps extends BaseTest {
         pengguna_melewati_onboarding_jika_ditampilkan();
         pengguna_memasukkan_username_dan_password("cashier1", "password");
         pengguna_berhasil_login_dengan_role("Kasir");
+    }
+
+
+    @After("@auth")
+    public void logoutAfterAuthTests() {
+        dashboardPage.clickLogoutButton();
     }
 }

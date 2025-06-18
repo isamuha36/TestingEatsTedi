@@ -12,7 +12,6 @@ import static org.junit.Assert.*;
 
 public class MenuSteps extends BaseTest {
 
-    // Deklarasi Page Objects
     private LoginPage loginPage;
     private MenuPage menuPage;
     private InvoicePage invoicePage;
@@ -28,7 +27,6 @@ public class MenuSteps extends BaseTest {
 
     @Given("menu {string} milik supplier {string} tersedia dengan stok ≥ {int}")
     public void menu_tersedia_dengan_stok_cukup(String menuName, String supplier, int stok) {
-        // PERBAIKAN: Inisialisasi pages di awal step
         initPages();
         assertTrue("Pre-condition failed: Menu " + menuName + " tidak tersedia", menuPage.isMenuAvailable(menuName));
     }
@@ -45,7 +43,6 @@ public class MenuSteps extends BaseTest {
         assertTrue("Halaman Menu tidak ditampilkan", menuPage.isMenuPageDisplayed());
     }
 
-    // Sisa method tidak perlu `initPages()` karena sudah dipanggil di step @Given sebelumnya
     @And("memilih menu {string} dan {string}")
     public void memilih_menu(String menu1, String menu2) {
         menuPage.selectMenu(menu1);
@@ -119,7 +116,7 @@ public class MenuSteps extends BaseTest {
 
     @When("memasukkan jumlah pembayaran lebih kecil dari total")
     public void memasukkan_jumlah_pembayaran_lebih_kecil_dari_total() {
-        String totalText = menuPage.getTotalAmount().replaceAll("[^\\d,]", "").replace(",", "."); // "Rp50.000,00" -> "50000.00"
+        String totalText = menuPage.getTotalAmount().replaceAll("[^\\d,]", "").replace(",", ".");
         double totalAmount = Double.parseDouble(totalText);
         double smallerAmount = totalAmount - 1000;
         menuPage.enterPaymentAmount(String.valueOf((int)smallerAmount));

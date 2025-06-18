@@ -5,7 +5,6 @@ import io.cucumber.java.Before;
 import io.cucumber.java.Scenario;
 
 public class Hooks extends BaseTest {
-
     @Before
     public void beforeScenario(Scenario scenario) {
         System.out.println("Starting scenario: " + scenario.getName());
@@ -16,7 +15,6 @@ public class Hooks extends BaseTest {
             throw new RuntimeException("Failed to setup driver: " + e.getMessage(), e);
         }
     }
-
     @After
     public void afterScenario(Scenario scenario) {
         System.out.println("Finished scenario: " + scenario.getName() + " with status: " + scenario.getStatus());

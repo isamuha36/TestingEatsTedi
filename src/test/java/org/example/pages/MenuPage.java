@@ -106,9 +106,9 @@ public class MenuPage {
 
     public boolean isMenuAvailable(String menuName) {
         try {
-            String xpath = String.format("//android.widget.TextView[@text='%s']", menuName);
-            WebElement menuItem = driver.findElement(By.xpath(xpath));
-            return menuItem.isDisplayed();
+            String xpath = String.format("//*[@resource-id='com.example.eatstedi:id/tv_menu_name' and @text='%s']", menuName);
+            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(xpath)));
+            return true;
         } catch (Exception e) {
             return false;
         }
@@ -116,11 +116,8 @@ public class MenuPage {
 
     public void setMenuQuantity(String menuName, int quantity) {
         try {
-            // Find the menu item in order panel
             String menuXpath = String.format("//android.widget.TextView[@text='%s']", menuName);
             WebElement menuInOrder = driver.findElement(By.xpath(menuXpath));
-
-            // Find the quantity controls relative to the menu item
             WebElement quantityText = menuInOrder.findElement(By.xpath(".//following-sibling::*//*[@id='tv_quantity']"));
             WebElement plusButton = menuInOrder.findElement(By.xpath(".//following-sibling::*//*[@id='btn_plus_order']"));
             WebElement minusButton = menuInOrder.findElement(By.xpath(".//following-sibling::*//*[@id='btn_minus_order']"));
