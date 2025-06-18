@@ -1,5 +1,3 @@
-# menu.feature
-
 Feature: Menu & Transaksi Pembayaran
 
   Background:
@@ -12,7 +10,7 @@ Feature: Menu & Transaksi Pembayaran
     And menu "Ayam Geprek" milik supplier "Naila" tersedia dengan stok ≥ 3
     When memilih menu "Nasi Goreng" dan "Ayam Geprek"
     And mengatur jumlah "Nasi Goreng" menjadi 3 dan "Ayam Geprek" menjadi 2
-    And memilih metode pembayaran "QRIS"
+    And pengguna memilih metode pembayaran "QRIS"
     And menekan tombol "Bayar"
     Then aplikasi menampilkan invoice transaksi berhasil
 
@@ -21,7 +19,7 @@ Feature: Menu & Transaksi Pembayaran
     Given menu "Ayam Bakar" milik supplier "Reza" tersedia dengan stok = 0
     When mencoba memilih menu "Ayam Bakar"
     Then menu tidak ditambahkan ke order
-    And aplikasi menampilkan pesan "Stok telah habis"
+    And aplikasi menampilkan pesan "Maaf, menu sudah habis"
 
   @menu @critical
   Scenario: Mengatur jumlah order menu invalid (0)
@@ -32,7 +30,7 @@ Feature: Menu & Transaksi Pembayaran
   @menu @critical
   Scenario: Transaksi pembayaran invalid (cash tidak cukup)
     Given menu "Nasi Goreng" milik supplier "Putri" sudah ada di panel order dengan jumlah 2
-    When pengguna memilih metode pembayaran "Tunai"
+    When pengguna memilih metode pembayaran "Cash"
     And memasukkan jumlah pembayaran lebih kecil dari total
     And menekan tombol "Bayar"
-    Then aplikasi menampilkan pesan "Jumlah uang tidak mencukupi"
+    Then aplikasi menampilkan pesan "Jumlah pembayaran kurang"

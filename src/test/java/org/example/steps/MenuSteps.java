@@ -4,7 +4,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
-import org.example.pages.DashboardKasirPage; // Import yang dibutuhkan untuk navigasi
+import org.example.pages.DashboardKasirPage;
 import org.example.pages.InvoicePage;
 import org.example.pages.LoginPage;
 import org.example.pages.MenuPage;
@@ -18,7 +18,6 @@ public class MenuSteps extends BaseTest {
     private InvoicePage invoicePage;
     private OnBoardingPage onBoardingPage;
 
-    // Method untuk inisialisasi semua page object yang dibutuhkan dalam class ini.
     private void initPages() {
         this.loginPage = new LoginPage(driver);
         this.menuPage = new MenuPage(driver);
@@ -29,26 +28,19 @@ public class MenuSteps extends BaseTest {
     @Given("menu {string} milik supplier {string} tersedia dengan stok ≥ {int}")
     public void menu_tersedia_dengan_stok_cukup(String menuName, String supplier, int stok) {
         initPages();
-        // Pre-condition untuk memastikan menu yang akan diuji memang ada di daftar.
         assertTrue("Pre-condition failed: Menu '" + menuName + "' tidak tersedia di daftar.", menuPage.isMenuAvailable(menuName));
     }
 
     @Given("menu {string} milik supplier {string} tersedia dengan stok = {int}")
     public void menu_tersedia_dengan_stok_nol(String menuName, String supplier, int stok) {
         initPages();
-        // Pre-condition untuk memastikan menu yang akan diuji memang ada di daftar.
         assertTrue("Pre-condition failed: Menu '" + menuName + "' tidak tersedia di daftar.", menuPage.isMenuAvailable(menuName));
     }
 
-    // =======================================================================
-    // MODIFIKASI UTAMA PADA STEP INI
-    // =======================================================================
     @When("pengguna membuka halaman Daftar Menu")
     public void pengguna_membuka_halaman_daftar_menu() {
         initPages();
-        // 1. Lakukan Aksi: Panggil metode untuk mengklik item navigasi 'Menu'.
         new DashboardKasirPage(driver).navigateToMenu();
-        // 2. Lakukan Verifikasi: Pastikan setelah klik, kita benar-benar berada di halaman yang benar.
         assertTrue("Gagal membuka halaman Daftar Menu setelah navigasi.", menuPage.isMenuPageDisplayed());
     }
 
@@ -64,8 +56,12 @@ public class MenuSteps extends BaseTest {
         menuPage.setMenuQuantity(menu2, qty2);
     }
 
-    @And("memilih metode pembayaran {string}")
-    public void memilih_metode_pembayaran(String method) {
+    // =======================================================================
+    // INI ADALAH PERUBAHAN UTAMA UNTUK MENGATASI ERROR "Step undefined"
+    // Anotasi diubah dari @And("memilih metode...") menjadi @When("pengguna memilih...")
+    // =======================================================================
+    @When("pengguna memilih metode pembayaran {string}")
+    public void pengguna_memilih_metode_pembayaran(String method) {
         menuPage.selectPaymentMethod(method);
     }
 
@@ -79,7 +75,7 @@ public class MenuSteps extends BaseTest {
     @Then("aplikasi menampilkan invoice transaksi berhasil")
     public void aplikasi_menampilkan_invoice_transaksi_berhasil() {
         assertTrue("Invoice transaksi tidak ditampilkan atau tidak valid.", invoicePage.isTransactionSuccessful());
-        invoicePage.closeInvoice(); // Tutup invoice untuk melanjutkan ke state berikutnya jika perlu
+        invoicePage.closeInvoice();
     }
 
     @When("mencoba memilih menu {string}")
@@ -94,7 +90,8 @@ public class MenuSteps extends BaseTest {
 
     @And("aplikasi menampilkan pesan {string}")
     public void aplikasi_menampilkan_pesan(String message) {
-        assertTrue("Pesan yang ditampilkan tidak sesuai. Pesan aktual: '" + menuPage.getToastMessage() + "'",
+        assertTrue("Pesan yang ditampilkan tidak sesuai. Pesan aktual:  " + menuPage.getToastMessage() +
+                   ". Pesan yang diharapkan: " + message,
                 menuPage.getToastMessage().contains(message));
     }
 

@@ -1,5 +1,6 @@
 package org.example.pages;
 
+import io.appium.java_client.AppiumBy;
 import io.appium.java_client.AppiumDriver;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
@@ -15,41 +16,19 @@ public class MenuPage {
     private AppiumDriver driver;
     private WebDriverWait wait;
 
+    // --- Locators untuk Bagian Daftar Menu ---
     @AndroidFindBy(id = "com.example.eatstedi:id/et_search_menu")
     private WebElement searchField;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/sp_filter_name")
-    private WebElement filterSpinner;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/btn_add_new_menu")
-    private WebElement addMenuButton;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/chip_all_menu")
-    private WebElement chipAllMenu;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/chip_foods")
-    private WebElement chipFoods;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/chip_drinks")
-    private WebElement chipDrinks;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/chip_snacks")
-    private WebElement chipSnacks;
 
     @AndroidFindBy(id = "com.example.eatstedi:id/rv_all_menu")
     private WebElement menuRecyclerView;
 
-    @AndroidFindBy(id = "com.example.eatstedi:id/tv_no_data")
-    private WebElement noDataMessage;
-
+    // --- Locators untuk Bagian Panel Order ---
     @AndroidFindBy(id = "com.example.eatstedi:id/nested_scroll_view")
     private WebElement orderPanel;
 
     @AndroidFindBy(id = "com.example.eatstedi:id/rv_order_menu")
     private WebElement orderRecyclerView;
-
-    @AndroidFindBy(id = "com.example.eatstedi:id/tv_empty_order")
-    private WebElement emptyOrderMessage;
 
     @AndroidFindBy(id = "com.example.eatstedi:id/tv_total_payment_amount")
     private WebElement totalPaymentAmount;
@@ -66,15 +45,11 @@ public class MenuPage {
     @AndroidFindBy(id = "com.example.eatstedi:id/btn_pay_now")
     private WebElement payButton;
 
-    @AndroidFindBy(id = "com.example.eatstedi:id/arrow_toggle")
-    private WebElement arrowToggle;
-
     @AndroidFindBy(xpath = "//android.widget.Toast")
     private WebElement toastMessage;
 
     public MenuPage(AppiumDriver driver) {
         this.driver = driver;
-        // PERBAIKAN: Waktu tunggu ditingkatkan menjadi 20 detik
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         PageFactory.initElements(new AppiumFieldDecorator(driver), this);
     }
@@ -88,19 +63,13 @@ public class MenuPage {
         }
     }
 
-    public void searchMenu(String menuName) {
-        wait.until(ExpectedConditions.elementToBeClickable(searchField));
-        searchField.clear();
-        searchField.sendKeys(menuName);
-    }
-
     public void selectMenu(String menuName) {
         try {
-            String xpath = String.format("//android.widget.TextView[@text='%s']", menuName);
-            WebElement menuItem = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(xpath)));
+            String menuXpath = String.format("//android.widget.TextView[@text='%s']", menuName);
+            WebElement menuItem = wait.until(ExpectedConditions.elementToBeClickable(By.xpath(menuXpath)));
             menuItem.click();
         } catch (Exception e) {
-            throw new RuntimeException("Menu " + menuName + " tidak ditemukan atau tidak dapat diklik");
+            throw new RuntimeException("Menu '" + menuName + "' tidak ditemukan atau tidak dapat diklik.", e);
         }
     }
 
@@ -114,48 +83,67 @@ public class MenuPage {
         }
     }
 
-    public void setMenuQuantity(String menuName, int quantity) {
+    private void ensureOrderPanelIsVisible() {
         try {
-            String menuXpath = String.format("//android.widget.TextView[@text='%s']", menuName);
-            WebElement menuInOrder = driver.findElement(By.xpath(menuXpath));
-            WebElement quantityText = menuInOrder.findElement(By.xpath(".//following-sibling::*//*[@id='tv_quantity']"));
-            WebElement plusButton = menuInOrder.findElement(By.xpath(".//following-sibling::*//*[@id='btn_plus_order']"));
-            WebElement minusButton = menuInOrder.findElement(By.xpath(".//following-sibling::*//*[@id='btn_minus_order']"));
+            System.out.println("Memastikan panel order terlihat...");
+            wait.until(ExpectedConditions.visibilityOf(orderPanel));
+            System.out.println("Panel order sudah terlihat.");
+        } catch (Exception e) {
+            throw new RuntimeException("Panel order tidak terlihat padahal seharusnya sudah terbuka.", e);
+        }
+    }
+
+    // =======================================================================
+    // PERBAIKAN TOTAL PADA METODE setMenuQuantity SESUAI XML ANDA
+    // =======================================================================
+    public void setMenuQuantity(String menuName, int targetQuantity) {
+        ensureOrderPanelIsVisible();
+
+        try {
+            // 1. Temukan WADAH UTAMA (FrameLayout) dari item yang spesifik.
+            // XPath ini mengatakan: "Di dalam rv_order_menu, cari FrameLayout yang
+            // di dalamnya (descendant::) ada TextView dengan nama menu yang dicari."
+            String itemContainerXpath = String.format(
+                    "//*[@resource-id='com.example.eatstedi:id/rv_order_menu']//android.widget.FrameLayout[.//android.widget.TextView[@text='%s']]",
+                    menuName
+            );
+            WebElement itemContainer = wait.until(ExpectedConditions.presenceOfElementLocated(By.xpath(itemContainerXpath)));
+
+            // 2. Sekarang, cari elemen-elemen di DALAM wadah FrameLayout yang sudah benar ini.
+            WebElement quantityText = itemContainer.findElement(AppiumBy.id("com.example.eatstedi:id/tv_quantity"));
+            WebElement plusButton = itemContainer.findElement(AppiumBy.id("com.example.eatstedi:id/btn_plus_order"));
+            WebElement minusButton = itemContainer.findElement(AppiumBy.id("com.example.eatstedi:id/btn_minus_order"));
 
             int currentQuantity = Integer.parseInt(quantityText.getText());
+            System.out.println("Mengatur jumlah '" + menuName + "' dari " + currentQuantity + " ke " + targetQuantity);
 
-            if (quantity > currentQuantity) {
-                for (int i = currentQuantity; i < quantity; i++) {
+            // 3. Loop untuk menambah atau mengurangi jumlah.
+            if (targetQuantity > currentQuantity) {
+                for (int i = currentQuantity; i < targetQuantity; i++) {
                     plusButton.click();
-                    Thread.sleep(500);
                 }
-            } else if (quantity < currentQuantity) {
-                for (int i = currentQuantity; i > quantity; i--) {
+            } else if (targetQuantity < currentQuantity) {
+                for (int i = currentQuantity; i > targetQuantity; i--) {
                     minusButton.click();
-                    Thread.sleep(500);
                 }
             }
         } catch (Exception e) {
-            throw new RuntimeException("Gagal mengatur jumlah menu " + menuName + " menjadi " + quantity);
+            System.err.println("Gagal menemukan elemen di dalam item order untuk '" + menuName + "'. Periksa XPath dan ID elemen (tv_quantity, btn_plus_order, dll).");
+            throw new RuntimeException("Gagal mengatur jumlah menu '" + menuName + "'.", e);
         }
     }
 
     public void selectPaymentMethod(String method) {
-        wait.until(ExpectedConditions.elementToBeClickable(arrowToggle));
-        if (!orderPanel.isDisplayed()) {
-            arrowToggle.click();
-        }
-
+        ensureOrderPanelIsVisible();
         if (method.equalsIgnoreCase("Cash") || method.equalsIgnoreCase("Tunai")) {
-            wait.until(ExpectedConditions.elementToBeClickable(cashRadioButton));
-            cashRadioButton.click();
+            wait.until(ExpectedConditions.elementToBeClickable(cashRadioButton)).click();
         } else if (method.equalsIgnoreCase("QRIS")) {
-            wait.until(ExpectedConditions.elementToBeClickable(qrisRadioButton));
-            qrisRadioButton.click();
+            wait.until(ExpectedConditions.elementToBeClickable(qrisRadioButton)).click();
         }
     }
 
     public void enterPaymentAmount(String amount) {
+        ensureOrderPanelIsVisible();
         if (paymentInputField.isDisplayed()) {
             wait.until(ExpectedConditions.elementToBeClickable(paymentInputField));
             paymentInputField.clear();
@@ -164,11 +152,12 @@ public class MenuPage {
     }
 
     public void clickPayButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(payButton));
-        payButton.click();
+        ensureOrderPanelIsVisible();
+        wait.until(ExpectedConditions.elementToBeClickable(payButton)).click();
     }
 
     public String getTotalAmount() {
+        ensureOrderPanelIsVisible();
         try {
             wait.until(ExpectedConditions.visibilityOf(totalPaymentAmount));
             return totalPaymentAmount.getText();
@@ -179,35 +168,21 @@ public class MenuPage {
 
     public String getToastMessage() {
         try {
-            wait.until(ExpectedConditions.visibilityOf(toastMessage));
-            return toastMessage.getText();
+            return wait.until(ExpectedConditions.visibilityOf(toastMessage)).getText();
         } catch (Exception e) {
             return "";
         }
     }
 
     public boolean isMenuInOrder(String menuName) {
+        ensureOrderPanelIsVisible();
         try {
-            String xpath = String.format("//android.widget.TextView[@text='%s']", menuName);
-            List<WebElement> menuItems = orderRecyclerView.findElements(By.xpath(xpath));
+            // Kita cari di dalam RecyclerView order, bukan di seluruh halaman
+            String xpath = String.format("//*[@resource-id='com.example.eatstedi:id/rv_order_menu']//android.widget.TextView[@text='%s']", menuName);
+            List<WebElement> menuItems = driver.findElements(By.xpath(xpath));
             return !menuItems.isEmpty();
         } catch (Exception e) {
             return false;
-        }
-    }
-
-    public boolean isOrderPanelEmpty() {
-        try {
-            return emptyOrderMessage.isDisplayed();
-        } catch (Exception e) {
-            return false;
-        }
-    }
-
-    public void openOrderPanel() {
-        if (!orderPanel.isDisplayed()) {
-            wait.until(ExpectedConditions.elementToBeClickable(arrowToggle));
-            arrowToggle.click();
         }
     }
 }

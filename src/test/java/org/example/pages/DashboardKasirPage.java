@@ -21,10 +21,6 @@ public class DashboardKasirPage {
     @AndroidFindBy(id = "com.example.eatstedi:id/nav_menu")
     private WebElement menuNavigationItem;
 
-    @AndroidFindBy(id = "android:id/button1")
-    private WebElement confirmLogoutButton;
-
-
     public DashboardKasirPage(AppiumDriver driver) {
         this.driver = driver;
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
@@ -68,9 +64,6 @@ public class DashboardKasirPage {
             System.err.println("GAGAL mengklik tombol 'Keluar'. Pastikan ID 'com.example.eatstedi:id/nav_logout' sudah benar dan elemennya interaktif.");
             throw new RuntimeException("Tidak dapat menemukan atau mengklik tombol logout.", e);
         }
-
-        System.out.println("Menekan tombol konfirmasi logout...");
-        wait.until(ExpectedConditions.elementToBeClickable(confirmLogoutButton)).click();
 
         LoginPage loginPage = new LoginPage(driver);
         wait.until(driver -> loginPage.isLoginPageDisplayed());
