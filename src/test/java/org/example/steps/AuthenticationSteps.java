@@ -50,7 +50,6 @@ public class AuthenticationSteps extends BaseTest {
 
     @And("pengguna menekan tombol {string}")
     public void pengguna_menekan_tombol(String buttonName) {
-        // Step ini sekarang bersifat deskriptif karena aksi klik sudah terjadi di dalam metode login()
         System.out.println("Tombol " + buttonName + " ditekan.");
     }
 
@@ -60,7 +59,6 @@ public class AuthenticationSteps extends BaseTest {
         if (role.equalsIgnoreCase("admin")) {
             assertTrue("Pengguna seharusnya admin, tetapi navigasi log aktivitas tidak ditemukan.", !logActivityNav.isEmpty());
         } else if (role.equalsIgnoreCase("kasir")) {
-            // Untuk kasir, pastikan navigasi log tidak ada
             assertTrue("Pengguna seharusnya kasir, tetapi navigasi log aktivitas ditemukan.", logActivityNav.isEmpty());
         }
     }
@@ -84,13 +82,11 @@ public class AuthenticationSteps extends BaseTest {
     @Given("pengguna sudah login sebagai Kasir")
     public void pengguna_sudah_login_sebagai_kasir() {
         initPages();
-        // Memastikan berada di halaman login sebelum mencoba login
         if (onboardingPage.isOnboardingScreenPresent()) {
             onboardingPage.skipOnboarding();
         }
         System.out.println("Melakukan login sebagai prasyarat (pre-condition)...");
         loginPage.login("cashier1", "password");
-        // Verifikasi login berhasil sebagai bagian dari pre-condition
         assertTrue("Gagal login sebagai Kasir untuk prasyarat pengujian.", dashboardPage.isUserLoggedIn());
         System.out.println("Login prasyarat berhasil.");
     }
