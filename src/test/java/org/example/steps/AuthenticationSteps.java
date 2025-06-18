@@ -4,19 +4,14 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
-import io.cucumber.java.After;
+// Perhatikan: 'import io.cucumber.java.After;' tidak lagi dibutuhkan di sini
 import org.example.pages.DashboardKasirPage;
 import org.example.pages.OnBoardingPage;
 import org.example.pages.LoginPage;
-import org.example.pages.MenuPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class AuthenticationSteps extends BaseTest {
@@ -49,12 +44,13 @@ public class AuthenticationSteps extends BaseTest {
 
     @And("pengguna memasukkan username {string} dan password {string}")
     public void pengguna_memasukkan_username_dan_password(String username, String password) {
-        System.out.println("Memasukan username dan pass");
+        System.out.println("Memasukan username dan password...");
         loginPage.login(username, password);
     }
 
     @And("pengguna menekan tombol {string}")
     public void pengguna_menekan_tombol(String buttonName) {
+        // Step ini sekarang bersifat deskriptif karena aksi klik sudah terjadi di dalam metode login()
         System.out.println("Tombol " + buttonName + " ditekan.");
     }
 
@@ -64,15 +60,13 @@ public class AuthenticationSteps extends BaseTest {
         if (role.equalsIgnoreCase("admin")) {
             assertTrue("Pengguna seharusnya admin, tetapi navigasi log aktivitas tidak ditemukan.", !logActivityNav.isEmpty());
         } else if (role.equalsIgnoreCase("kasir")) {
+            // Untuk kasir, pastikan navigasi log tidak ada
             assertTrue("Pengguna seharusnya kasir, tetapi navigasi log aktivitas ditemukan.", logActivityNav.isEmpty());
         }
     }
 
     @And("pengguna diarahkan ke halaman Dashboard Kasir")
     public void pengguna_diarahkan_ke_halaman_dashboard_kasir() {
-        if (!dashboardPage.isDashboardActive()) {
-            fail("Pengguna tidak diarahkan ke Dashboard Kasir");
-        }
         assertTrue("Pengguna tidak diarahkan ke Dashboard Kasir", dashboardPage.isDashboardActive());
     }
 
@@ -90,14 +84,15 @@ public class AuthenticationSteps extends BaseTest {
     @Given("pengguna sudah login sebagai Kasir")
     public void pengguna_sudah_login_sebagai_kasir() {
         initPages();
-        pengguna_melewati_onboarding_jika_ditampilkan();
-        pengguna_memasukkan_username_dan_password("cashier1", "password");
-        pengguna_berhasil_login_dengan_role("Kasir");
+        // Memastikan berada di halaman login sebelum mencoba login
+        if (onboardingPage.isOnboardingScreenPresent()) {
+            onboardingPage.skipOnboarding();
+        }
+        System.out.println("Melakukan login sebagai prasyarat (pre-condition)...");
+        loginPage.login("cashier1", "password");
+        // Verifikasi login berhasil sebagai bagian dari pre-condition
+        assertTrue("Gagal login sebagai Kasir untuk prasyarat pengujian.", dashboardPage.isUserLoggedIn());
+        System.out.println("Login prasyarat berhasil.");
     }
 
-
-    @After("@auth")
-    public void logoutAfterAuthTests() {
-        dashboardPage.clickLogoutButton();
-    }
 }
