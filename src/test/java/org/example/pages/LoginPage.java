@@ -1,9 +1,12 @@
 package org.example.pages;
 
 import io.appium.java_client.AppiumDriver;
+import io.appium.java_client.MobileBy;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.net.UrlChecker;
 import org.openqa.selenium.support.PageFactory;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.openqa.selenium.support.ui.ExpectedConditions;
@@ -76,20 +79,32 @@ public class LoginPage {
 
     public boolean isErrorMessageDisplayed(String expectedMessage) {
         try {
-
-            String actualMessage = getToastMessage();
+            String actualMessage = getToastMessage(expectedMessage, 1);
             return actualMessage.contains(expectedMessage);
         } catch (Exception e) {
             return false;
         }
     }
 
-    public String getToastMessage() {
+public String getToastMessage(String expectedToastText, int timeoutSeconds) {
         try {
-            wait.until(ExpectedConditions.visibilityOf(toastMessage));
-            return toastMessage.getText();
-        } catch (Exception e) {
-            return "";
+            // Define the XPath dynamically based on the expected toast text
+            String toastXPath = String.format("//android.widget.Toast[contains(@text, '%s')]", expectedToastText);
+
+            // Initialize WebDriverWait with the specified timeout
+            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
+
+            // Wait for the Toast to appear and locate it
+            WebElement toastElement = wait.until(ExpectedConditions.presenceOfElementLocated(
+                    MobileBy.xpath(toastXPath)
+            ));
+
+            // Retrieve and return the Toast text
+            String toastText = toastElement.getText();
+            return toastText;
+
+        } catch (NoSuchElementException e) {
+            throw new RuntimeException("Failed to locate Toast element", e);
         }
     }
 }

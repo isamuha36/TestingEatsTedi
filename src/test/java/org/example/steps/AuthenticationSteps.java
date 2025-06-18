@@ -98,16 +98,10 @@ public class AuthenticationSteps extends BaseTest {
         assertTrue("Pengguna tidak berada di halaman Login", loginPage.isLoginPageDisplayed());
     }
 
-    // Ini adalah perbaikan untuk NullPointerException di skenario @menu
     @Given("pengguna sudah login sebagai Kasir")
     public void pengguna_sudah_login_sebagai_kasir() {
-        // 1. Inisialisasi semua Page Objects terlebih dahulu
         initPages();
-
-        // 2. Panggil langkah yang sudah robust untuk melewati onboarding
         pengguna_melewati_onboarding_jika_ditampilkan();
-
-        // 3. Lanjutkan sisa langkah login
         pengguna_memasukkan_username_dan_password("cashier1", "password");
         pengguna_berhasil_login_dengan_role("Kasir");
     }

@@ -53,6 +53,7 @@
             <version>2.0.13</version>
             <scope>test</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/androidx.test.uiautomator/uiautomator -->
 
     </dependencies>
 
