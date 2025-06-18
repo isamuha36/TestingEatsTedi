@@ -4,19 +4,14 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
-import io.cucumber.java.After;
+// Perhatikan: 'import io.cucumber.java.After;' tidak lagi dibutuhkan di sini
 import org.example.pages.DashboardKasirPage;
 import org.example.pages.OnBoardingPage;
 import org.example.pages.LoginPage;
-import org.example.pages.MenuPage;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
-import java.time.Duration;
 import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class AuthenticationSteps extends BaseTest {
@@ -56,6 +51,7 @@ public class AuthenticationSteps extends BaseTest {
 
     @And("pengguna menekan tombol {string}")
     public void pengguna_menekan_tombol(String buttonName) {
+        // Step ini sekarang bersifat deskriptif karena aksi klik sudah terjadi di dalam metode login()
         System.out.println("Tombol " + buttonName + " ditekan.");
     }
 
@@ -66,6 +62,7 @@ public class AuthenticationSteps extends BaseTest {
         if (role.equalsIgnoreCase("admin")) {
             assertTrue("Pengguna seharusnya admin, tetapi navigasi log aktivitas tidak ditemukan.", !logActivityNav.isEmpty());
         } else if (role.equalsIgnoreCase("kasir")) {
+            // Untuk kasir, pastikan navigasi log tidak ada
             assertTrue("Pengguna seharusnya kasir, tetapi navigasi log aktivitas ditemukan.", logActivityNav.isEmpty());
 
         }
