@@ -47,6 +47,7 @@ public class LoginPage {
     }
 
     public void enterUsername(String username) {
+        wait.until(ExpectedConditions.presenceOfElementLocated(MobileBy.id("com.example.eatstedi:id/et_username")));
         wait.until(ExpectedConditions.elementToBeClickable(usernameField));
         usernameField.clear();
         usernameField.sendKeys(username);
@@ -64,6 +65,7 @@ public class LoginPage {
     }
 
     public void login(String username, String password) {
+        wait.until(ExpectedConditions.visibilityOf(usernameField)); // memastikan halaman login muncul
         enterUsername(username);
         enterPassword(password);
         clickLoginButton();
