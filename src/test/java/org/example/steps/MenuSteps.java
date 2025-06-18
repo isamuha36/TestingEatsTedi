@@ -4,6 +4,7 @@ import io.cucumber.java.en.Given;
 import io.cucumber.java.en.When;
 import io.cucumber.java.en.Then;
 import io.cucumber.java.en.And;
+import org.example.pages.DashboardKasirPage; // Import yang dibutuhkan untuk navigasi
 import org.example.pages.InvoicePage;
 import org.example.pages.LoginPage;
 import org.example.pages.MenuPage;
@@ -17,7 +18,7 @@ public class MenuSteps extends BaseTest {
     private InvoicePage invoicePage;
     private OnBoardingPage onBoardingPage;
 
-    // PERBAIKAN: Hapus constructor, ganti dengan method initPages
+    // Method untuk inisialisasi semua page object yang dibutuhkan dalam class ini.
     private void initPages() {
         this.loginPage = new LoginPage(driver);
         this.menuPage = new MenuPage(driver);
@@ -28,19 +29,27 @@ public class MenuSteps extends BaseTest {
     @Given("menu {string} milik supplier {string} tersedia dengan stok ≥ {int}")
     public void menu_tersedia_dengan_stok_cukup(String menuName, String supplier, int stok) {
         initPages();
-        assertTrue("Pre-condition failed: Menu " + menuName + " tidak tersedia", menuPage.isMenuAvailable(menuName));
+        // Pre-condition untuk memastikan menu yang akan diuji memang ada di daftar.
+        assertTrue("Pre-condition failed: Menu '" + menuName + "' tidak tersedia di daftar.", menuPage.isMenuAvailable(menuName));
     }
 
     @Given("menu {string} milik supplier {string} tersedia dengan stok = {int}")
     public void menu_tersedia_dengan_stok_nol(String menuName, String supplier, int stok) {
         initPages();
-        assertTrue("Pre-condition failed: Menu " + menuName + " tidak tersedia", menuPage.isMenuAvailable(menuName));
+        // Pre-condition untuk memastikan menu yang akan diuji memang ada di daftar.
+        assertTrue("Pre-condition failed: Menu '" + menuName + "' tidak tersedia di daftar.", menuPage.isMenuAvailable(menuName));
     }
 
+    // =======================================================================
+    // MODIFIKASI UTAMA PADA STEP INI
+    // =======================================================================
     @When("pengguna membuka halaman Daftar Menu")
     public void pengguna_membuka_halaman_daftar_menu() {
         initPages();
-        assertTrue("Halaman Menu tidak ditampilkan", menuPage.isMenuPageDisplayed());
+        // 1. Lakukan Aksi: Panggil metode untuk mengklik item navigasi 'Menu'.
+        new DashboardKasirPage(driver).navigateToMenu();
+        // 2. Lakukan Verifikasi: Pastikan setelah klik, kita benar-benar berada di halaman yang benar.
+        assertTrue("Gagal membuka halaman Daftar Menu setelah navigasi.", menuPage.isMenuPageDisplayed());
     }
 
     @And("memilih menu {string} dan {string}")
@@ -69,8 +78,8 @@ public class MenuSteps extends BaseTest {
 
     @Then("aplikasi menampilkan invoice transaksi berhasil")
     public void aplikasi_menampilkan_invoice_transaksi_berhasil() {
-        assertTrue("Invoice transaksi tidak ditampilkan atau tidak valid", invoicePage.isTransactionSuccessful());
-        invoicePage.closeInvoice();
+        assertTrue("Invoice transaksi tidak ditampilkan atau tidak valid.", invoicePage.isTransactionSuccessful());
+        invoicePage.closeInvoice(); // Tutup invoice untuk melanjutkan ke state berikutnya jika perlu
     }
 
     @When("mencoba memilih menu {string}")
@@ -80,12 +89,12 @@ public class MenuSteps extends BaseTest {
 
     @Then("menu tidak ditambahkan ke order")
     public void menu_tidak_ditambahkan_ke_order() {
-        assertFalse("Menu Ayam Bakar seharusnya tidak ada di panel order", menuPage.isMenuInOrder("Ayam Bakar"));
+        assertFalse("Menu 'Ayam Bakar' seharusnya tidak ada di panel order.", menuPage.isMenuInOrder("Ayam Bakar"));
     }
 
     @And("aplikasi menampilkan pesan {string}")
     public void aplikasi_menampilkan_pesan(String message) {
-        assertTrue("Pesan yang ditampilkan tidak sesuai: " + menuPage.getToastMessage(),
+        assertTrue("Pesan yang ditampilkan tidak sesuai. Pesan aktual: '" + menuPage.getToastMessage() + "'",
                 menuPage.getToastMessage().contains(message));
     }
 
@@ -93,7 +102,7 @@ public class MenuSteps extends BaseTest {
     public void menu_sudah_ada_di_panel_order(String menuName, String supplier) {
         initPages();
         menuPage.selectMenu(menuName);
-        assertTrue("Setup failed: Menu " + menuName + " tidak ada di panel order", menuPage.isMenuInOrder(menuName));
+        assertTrue("Setup failed: Menu '" + menuName + "' tidak ada di panel order.", menuPage.isMenuInOrder(menuName));
     }
 
     @When("pengguna mengatur jumlah {string} menjadi {int}")
@@ -103,7 +112,7 @@ public class MenuSteps extends BaseTest {
 
     @Then("menu {string} dihapus dari panel order")
     public void menu_dihapus_dari_panel_order(String menuName) {
-        assertFalse("Menu " + menuName + " seharusnya sudah terhapus dari panel order", menuPage.isMenuInOrder(menuName));
+        assertFalse("Menu '" + menuName + "' seharusnya sudah terhapus dari panel order.", menuPage.isMenuInOrder(menuName));
     }
 
     @Given("menu {string} milik supplier {string} sudah ada di panel order dengan jumlah {int}")
@@ -111,7 +120,7 @@ public class MenuSteps extends BaseTest {
         initPages();
         menuPage.selectMenu(menuName);
         menuPage.setMenuQuantity(menuName, qty);
-        assertTrue("Setup failed: Gagal mengatur jumlah menu", menuPage.isMenuInOrder(menuName));
+        assertTrue("Setup failed: Gagal mengatur jumlah menu.", menuPage.isMenuInOrder(menuName));
     }
 
     @When("memasukkan jumlah pembayaran lebih kecil dari total")

@@ -4,13 +4,13 @@ Feature: Menu & Transaksi Pembayaran
 
   Background:
     Given pengguna sudah login sebagai Kasir
+    And pengguna membuka halaman Daftar Menu
 
   @menu @critical
   Scenario: Transaksi pembayaran valid (QRIS)
     Given menu "Nasi Goreng" milik supplier "Putri" tersedia dengan stok ≥ 3
     And menu "Ayam Geprek" milik supplier "Naila" tersedia dengan stok ≥ 3
-    When pengguna membuka halaman Daftar Menu
-    And memilih menu "Nasi Goreng" dan "Ayam Geprek"
+    When memilih menu "Nasi Goreng" dan "Ayam Geprek"
     And mengatur jumlah "Nasi Goreng" menjadi 3 dan "Ayam Geprek" menjadi 2
     And memilih metode pembayaran "QRIS"
     And menekan tombol "Bayar"
@@ -19,8 +19,7 @@ Feature: Menu & Transaksi Pembayaran
   @menu @critical
   Scenario: Memilih menu invalid (stok habis)
     Given menu "Ayam Bakar" milik supplier "Reza" tersedia dengan stok = 0
-    When pengguna membuka halaman Daftar Menu
-    And mencoba memilih menu "Ayam Bakar"
+    When mencoba memilih menu "Ayam Bakar"
     Then menu tidak ditambahkan ke order
     And aplikasi menampilkan pesan "Stok telah habis"
 
