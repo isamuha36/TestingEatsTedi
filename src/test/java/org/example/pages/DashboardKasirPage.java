@@ -13,7 +13,8 @@ import java.time.Duration;
 public class DashboardKasirPage {
     private AppiumDriver driver;
     private WebDriverWait wait;
-    @AndroidFindBy(xpath = "//android.widget.CheckedTextView[@text='Keluar'")
+
+    @AndroidFindBy(xpath = "//android.widget.CheckedTextView[@text='Keluar']")
     private WebElement logoutButton;
 
 

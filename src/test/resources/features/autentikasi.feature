@@ -20,3 +20,4 @@ Feature: Authentication
     And pengguna menekan tombol "Login"
     Then pengguna berhasil login dengan role "Kasir"
     And pengguna diarahkan ke halaman Dashboard Kasir
+    Then Logout

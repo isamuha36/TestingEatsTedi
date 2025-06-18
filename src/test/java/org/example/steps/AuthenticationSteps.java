@@ -50,6 +50,7 @@ public class AuthenticationSteps extends BaseTest {
     @And("pengguna memasukkan username {string} dan password {string}")
     public void pengguna_memasukkan_username_dan_password(String username, String password) {
         System.out.println("Memasukan username dan pass");
+        System.out.println("Halaman saat ini: " + driver.getPageSource());
         loginPage.login(username, password);
     }
 
@@ -61,19 +62,24 @@ public class AuthenticationSteps extends BaseTest {
     @Then("pengguna berhasil login dengan role {string}")
     public void pengguna_berhasil_login_dengan_role(String role) {
         List<WebElement> logActivityNav = driver.findElements(By.id("com.example.eatstedi:id/log_activity_nav"));
+
         if (role.equalsIgnoreCase("admin")) {
             assertTrue("Pengguna seharusnya admin, tetapi navigasi log aktivitas tidak ditemukan.", !logActivityNav.isEmpty());
         } else if (role.equalsIgnoreCase("kasir")) {
             assertTrue("Pengguna seharusnya kasir, tetapi navigasi log aktivitas ditemukan.", logActivityNav.isEmpty());
+
         }
     }
 
     @And("pengguna diarahkan ke halaman Dashboard Kasir")
     public void pengguna_diarahkan_ke_halaman_dashboard_kasir() {
         if (!dashboardPage.isDashboardActive()) {
+            System.out.println("Halaman saat ini: " + driver.getPageSource());
             fail("Pengguna tidak diarahkan ke Dashboard Kasir");
         }
         assertTrue("Pengguna tidak diarahkan ke Dashboard Kasir", dashboardPage.isDashboardActive());
+        System.out.println("Halaman saat ini: " + driver.getPageSource());
+
     }
 
     @Then("aplikasi menampilkan pesan error {string}")
@@ -84,7 +90,13 @@ public class AuthenticationSteps extends BaseTest {
 
     @And("pengguna tetap di halaman Login")
     public void pengguna_tetap_di_halaman_login() {
+        System.out.println("Halaman saat ini: " + driver.getPageSource());
         assertTrue("Pengguna tidak berada di halaman Login", loginPage.isLoginPageDisplayed());
+    }
+
+    @Then("Logout")
+    public void logout() {
+        dashboardPage.clickLogoutButton();
     }
 
     @Given("pengguna sudah login sebagai Kasir")
@@ -93,11 +105,7 @@ public class AuthenticationSteps extends BaseTest {
         pengguna_melewati_onboarding_jika_ditampilkan();
         pengguna_memasukkan_username_dan_password("cashier1", "password");
         pengguna_berhasil_login_dengan_role("Kasir");
+
     }
 
-
-    @After("@auth")
-    public void logoutAfterAuthTests() {
-        dashboardPage.clickLogoutButton();
-    }
 }
