@@ -6,6 +6,8 @@ import io.cucumber.java.Scenario;
 import org.example.pages.DashboardKasirPage;
 
 public class Hooks extends BaseTest {
+
+    // Before scenario yang akan dijalankan sebelum setiap skenario
     @Before
     public void beforeScenario(Scenario scenario) {
         System.out.println("====================================================");
@@ -19,7 +21,7 @@ public class Hooks extends BaseTest {
         }
     }
 
-    // MODIFIKASI TOTAL PADA METODE @After
+    // After scenario yang akan dijalankan setelah setiap skenario
     @After
     public void afterScenario(Scenario scenario) {
         System.out.println("----------------------------------------------------");
@@ -32,7 +34,7 @@ public class Hooks extends BaseTest {
                 // Inisialisasi page object yang dibutuhkan untuk logout
                 DashboardKasirPage dashboardPage = new DashboardKasirPage(driver);
 
-                // MODIFIKASI: Menggunakan metode isUserLoggedIn() yang lebih andal.
+                // Menggunakan metode isUserLoggedIn() yang lebih andal.
                 // Ini akan mendeteksi status login baik di halaman Dasbor, Menu, atau halaman lainnya.
                 if (dashboardPage.isUserLoggedIn()) {
                     System.out.println("Pengguna terdeteksi login (navigation drawer ditemukan). Memulai proses logout...");

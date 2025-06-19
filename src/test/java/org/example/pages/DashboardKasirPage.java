@@ -17,7 +17,6 @@ public class DashboardKasirPage {
     @AndroidFindBy(id = "com.example.eatstedi:id/nav_logout")
     private WebElement logoutMenuItem;
 
-    // BARU: Tambahkan locator untuk item navigasi 'Menu'
     @AndroidFindBy(id = "com.example.eatstedi:id/nav_menu")
     private WebElement menuNavigationItem;
 
@@ -47,7 +46,7 @@ public class DashboardKasirPage {
         }
     }
 
-    // BARU: Tambahkan metode untuk melakukan navigasi ke halaman Menu
+    // Metode untuk melakukan navigasi ke halaman Menu
     public void navigateToMenu() {
         System.out.println("Menavigasi ke halaman Menu...");
         wait.until(ExpectedConditions.elementToBeClickable(menuNavigationItem)).click();
@@ -61,7 +60,7 @@ public class DashboardKasirPage {
             System.out.println("Tombol 'Keluar' berhasil diklik.");
 
         } catch (Exception e) {
-            System.err.println("GAGAL mengklik tombol 'Keluar'. Pastikan ID 'com.example.eatstedi:id/nav_logout' sudah benar dan elemennya interaktif.");
+            System.err.println("GAGAL mengklik tombol 'Keluar'.");
             throw new RuntimeException("Tidak dapat menemukan atau mengklik tombol logout.", e);
         }
 

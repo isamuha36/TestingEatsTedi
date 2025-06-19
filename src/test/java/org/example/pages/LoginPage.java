@@ -88,20 +88,20 @@ public class LoginPage {
         }
     }
 
-public String getToastMessage(String expectedToastText, int timeoutSeconds) {
+    public String getToastMessage(String expectedToastText, int timeoutSeconds) {
         try {
-            // Define the XPath dynamically based on the expected toast text
+            // Menentukan XPath untuk Toast berdasarkan teks yang diharapkan
             String toastXPath = String.format("//android.widget.Toast[contains(@text, '%s')]", expectedToastText);
 
-            // Initialize WebDriverWait with the specified timeout
+            // Membuat WebDriverWait dengan durasi timeout yang ditentukan
             WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(timeoutSeconds));
 
-            // Wait for the Toast to appear and locate it
+            // Menunggu hingga elemen Toast muncul
             WebElement toastElement = wait.until(ExpectedConditions.presenceOfElementLocated(
                     MobileBy.xpath(toastXPath)
             ));
 
-            // Retrieve and return the Toast text
+            // Mengambil teks dari elemen Toast
             String toastText = toastElement.getText();
             return toastText;
 
