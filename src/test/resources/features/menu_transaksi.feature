@@ -2,7 +2,7 @@ Feature: Menu & Transaksi Pembayaran
 
   Background:
     Given pengguna sudah login sebagai Kasir
-    And pengguna membuka halaman Daftar Menu
+    When pengguna membuka halaman Daftar Menu
 
   @menu @critical
   Scenario: Transaksi pembayaran valid (QRIS)
@@ -14,12 +14,12 @@ Feature: Menu & Transaksi Pembayaran
     And menekan tombol "Bayar"
     Then aplikasi menampilkan invoice transaksi berhasil
 
-  @menu @critical
+  @menu @critical @stok-habis
   Scenario: Memilih menu invalid (stok habis)
     Given menu "Ayam Bakar" milik supplier "Reza" tersedia dengan stok = 0
     When mencoba memilih menu "Ayam Bakar"
-    Then menu tidak ditambahkan ke order
-    And aplikasi menampilkan pesan "Maaf, menu sudah habis"
+    Then aplikasi menampilkan pesan "Maaf, menu sudah habis"
+    And menu tidak ditambahkan ke order
 
   @menu @critical
   Scenario: Mengatur jumlah order menu invalid (0)
@@ -27,7 +27,7 @@ Feature: Menu & Transaksi Pembayaran
     When pengguna mengatur jumlah "Nasi Goreng" menjadi 0
     Then menu "Nasi Goreng" dihapus dari panel order
 
-  @menu @critical
+  @menu @critical @payment-validation
   Scenario: Transaksi pembayaran invalid (cash tidak cukup)
     Given menu "Nasi Goreng" milik supplier "Putri" sudah ada di panel order dengan jumlah 2
     When pengguna memilih metode pembayaran "Cash"

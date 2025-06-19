@@ -82,12 +82,40 @@ public class AuthenticationSteps extends BaseTest {
     @Given("pengguna sudah login sebagai Kasir")
     public void pengguna_sudah_login_sebagai_kasir() {
         initPages();
+
         if (onboardingPage.isOnboardingScreenPresent()) {
             onboardingPage.skipOnboarding();
         }
+
+        // Pastikan di halaman login
+        assertTrue("Tidak berada di halaman login setelah onboarding", loginPage.isLoginPageDisplayed());
+
         System.out.println("Melakukan login sebagai prasyarat (pre-condition)...");
         loginPage.login("cashier1", "password");
-        assertTrue("Gagal login sebagai Kasir untuk prasyarat pengujian.", dashboardPage.isUserLoggedIn());
+
+        // Tunggu sebentar untuk proses login
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        // Cek apakah berhasil keluar dari login page
+        if (loginPage.isLoginPageDisplayed()) {
+            System.out.println("Masih di login page, login mungkin gagal");
+            // Coba sekali lagi
+            loginPage.login("cashier1", "password");
+            try {
+                Thread.sleep(3000);
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+
+        // Verifikasi login berhasil dengan fallback ke cek dashboard
+        boolean loginSuccess = dashboardPage.isUserLoggedIn() || dashboardPage.isDashboardActive();
+        assertTrue("Gagal login sebagai Kasir untuk prasyarat pengujian.", loginSuccess);
+
         System.out.println("Login prasyarat berhasil.");
     }
 

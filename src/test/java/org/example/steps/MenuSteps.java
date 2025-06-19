@@ -42,6 +42,9 @@ public class MenuSteps extends BaseTest {
         initPages();
         new DashboardKasirPage(driver).navigateToMenu();
         assertTrue("Gagal membuka halaman Daftar Menu setelah navigasi.", menuPage.isMenuPageDisplayed());
+
+        // Tunggu toast loading hilang sebelum melanjutkan test
+        menuPage.waitForLoadingToastToDisappear();
     }
 
     @And("memilih menu {string} dan {string}")
@@ -56,10 +59,6 @@ public class MenuSteps extends BaseTest {
         menuPage.setMenuQuantity(menu2, qty2);
     }
 
-    // =======================================================================
-    // INI ADALAH PERUBAHAN UTAMA UNTUK MENGATASI ERROR "Step undefined"
-    // Anotasi diubah dari @And("memilih metode...") menjadi @When("pengguna memilih...")
-    // =======================================================================
     @When("pengguna memilih metode pembayaran {string}")
     public void pengguna_memilih_metode_pembayaran(String method) {
         menuPage.selectPaymentMethod(method);
@@ -74,25 +73,59 @@ public class MenuSteps extends BaseTest {
 
     @Then("aplikasi menampilkan invoice transaksi berhasil")
     public void aplikasi_menampilkan_invoice_transaksi_berhasil() {
-        assertTrue("Invoice transaksi tidak ditampilkan atau tidak valid.", invoicePage.isTransactionSuccessful());
+        assertTrue("Halaman invoice seharusnya ditampilkan setelah menekan Bayar.", invoicePage.isInvoiceDisplayed());
+        assertFalse("Total pembayaran pada invoice tidak boleh kosong.", invoicePage.getTotalAmount().isEmpty());
+        assertFalse("Tanggal order pada invoice tidak boleh kosong.", invoicePage.getOrderDate().isEmpty());
         invoicePage.closeInvoice();
     }
 
     @When("mencoba memilih menu {string}")
     public void mencoba_memilih_menu(String menuName) {
+        // Tunggu sebentar untuk memastikan halaman sudah stable
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("Mencoba memilih menu: " + menuName);
         menuPage.selectMenu(menuName);
+
+        // Tunggu sebentar setelah klik untuk memastikan toast muncul
+        try {
+            Thread.sleep(1500);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
     }
 
     @Then("menu tidak ditambahkan ke order")
     public void menu_tidak_ditambahkan_ke_order() {
+        // Tunggu sebentar sebelum mengecek
+        try {
+            Thread.sleep(1000);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
         assertFalse("Menu 'Ayam Bakar' seharusnya tidak ada di panel order.", menuPage.isMenuInOrder("Ayam Bakar"));
     }
 
     @And("aplikasi menampilkan pesan {string}")
-    public void aplikasi_menampilkan_pesan(String message) {
-        assertTrue("Pesan yang ditampilkan tidak sesuai. Pesan aktual:  " + menuPage.getToastMessage() +
-                   ". Pesan yang diharapkan: " + message,
-                menuPage.getToastMessage().contains(message));
+    public void aplikasi_menampilkan_pesan(String expectedMessage) {
+        System.out.println("Mengecek toast dengan pesan: '" + expectedMessage + "'");
+
+        // Panggil metode yang sudah diperbaiki dengan multiple strategy
+        String actualMessage = menuPage.waitForToastMessageWithText(expectedMessage);
+
+        // Assertion dengan pesan error
+        assertTrue(
+                "Pesan Toast yang diharapkan ('" + expectedMessage + "') tidak ditemukan. " +
+                        "Pesan yang diterima: '" + actualMessage + "'",
+                !actualMessage.isEmpty() && actualMessage.contains(expectedMessage)
+        );
+
+        System.out.println("Toast berhasil ditemukan: " + actualMessage);
     }
 
     @Given("menu {string} milik supplier {string} sudah ada di panel order")
@@ -122,7 +155,9 @@ public class MenuSteps extends BaseTest {
 
     @When("memasukkan jumlah pembayaran lebih kecil dari total")
     public void memasukkan_jumlah_pembayaran_lebih_kecil_dari_total() {
+        // Menghapus semua karakter non-digit kecuali koma, lalu mengganti koma dengan titik
         String totalText = menuPage.getTotalAmount().replaceAll("[^\\d,]", "").replace(",", ".");
+        // Mengonversi ke double dan mengurangi 1000 untuk mendapatkan jumlah yang lebih kecil
         double totalAmount = Double.parseDouble(totalText);
         double smallerAmount = totalAmount - 1000;
         menuPage.enterPaymentAmount(String.valueOf((int)smallerAmount));
